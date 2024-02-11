@@ -8,6 +8,7 @@ import BadRequestError from '../errors/BadRequestError';
 // import { v4 as uuidv4 } from 'uuid';
 import { validate as validateuuid } from 'uuid';
 import isUuidNotExist from '../utils/isUuidNotExist';
+import { User } from 'data/types';
 
 export default class Api implements IApi {
   constructor() {}
@@ -48,5 +49,28 @@ export default class Api implements IApi {
     } catch (error) {
       handleError(error as Error, res);
     }
+  }
+
+  public async getBody(req: IncomingMessage): Promise<User[]> {
+    return new Promise((resolve, reject) => {
+      let body: string = '';
+
+      req.on('data', (chunk: Uint8Array) => {
+        body += chunk;
+      });
+
+      req.on('end', () => {
+        try {
+          const result = JSON.parse(body);
+          resolve(result);
+        } catch (error) {
+          reject(new BadRequestError());
+        }
+      });
+
+      req.on('error', () => {
+        reject(new BadRequestError());
+      });
+    });
   }
 }

@@ -1,5 +1,5 @@
 import { IncomingMessage, ServerResponse } from 'http';
-import { UserStorage } from './types';
+import { User, UserStorage } from './types';
 
 export interface IController {
   startServer: () => void;
@@ -16,4 +16,5 @@ export interface IApi {
     res: ServerResponse<IncomingMessage>,
     req: IncomingMessage
   ) => void;
+  getBody: (req: IncomingMessage) => Promise<User[]>;
 }
