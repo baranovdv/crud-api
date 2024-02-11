@@ -1,5 +1,5 @@
 export default class UnsupportedMethodError extends Error {
-  constructor(message = 'Unsupported method') {
+  constructor(message = 'Method not allowed') {
     super(message);
   }
 }

@@ -11,4 +11,8 @@ export default class Storage implements IStorage {
   createUser() {
     console.log(this.storage);
   }
+
+  public getStorage() {
+    return this.storage;
+  }
 }
