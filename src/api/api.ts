@@ -10,6 +10,7 @@ import { validate as validateuuid } from 'uuid';
 import isUuidNotExist from '../utils/isUuidNotExist';
 import { User } from '../data/types';
 import { STATUS } from '../data/enums';
+import isArrayOfStrOrEmpty from '../utils/isArrayOfStrOrEmpty';
 
 export default class Api implements IApi {
   constructor() {}
@@ -34,6 +35,20 @@ export default class Api implements IApi {
     if (isUuidNotExist(urlSplitted[3])) return null;
 
     return validateuuid(urlSplitted[3] ?? '') ? null : 'Non-valid id';
+  }
+
+  private POSTbodyCheck(body: User): boolean {
+    if (!body.age || !body.username || !body.hobbies) return false;
+    if (Object.keys(body).length > 3) return false;
+    if (
+      typeof body.age !== 'number' ||
+      typeof body.username !== 'string' ||
+      !isArrayOfStrOrEmpty(body.hobbies)
+    ) {
+      return false;
+    }
+
+    return true;
   }
 
   public checkURL(res: ServerResponse<IncomingMessage>, req: IncomingMessage) {
@@ -66,6 +81,11 @@ export default class Api implements IApi {
       req.on('end', () => {
         try {
           const result = JSON.parse(body);
+
+          if (!this.POSTbodyCheck(result)) {
+            reject(new BadRequestError('Bad body data'));
+          }
+
           resolve(result);
         } catch (error) {
           reject(new BadRequestError());
@@ -78,8 +98,12 @@ export default class Api implements IApi {
     });
   }
 
-  public sendResponse(res: ServerResponse<IncomingMessage>, payload: string) {
-    res.writeHead(200, { 'Content-Type': 'application/json' });
+  public sendResponse(
+    res: ServerResponse<IncomingMessage>,
+    payload: string,
+    status = 200
+  ) {
+    res.writeHead(status, { 'Content-Type': 'application/json' });
     res.end(payload);
   }
 }

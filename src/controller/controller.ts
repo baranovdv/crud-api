@@ -7,6 +7,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { STATUS } from '../data/enums';
 import NotFoundError from '../errors/NotFoundError';
 
+const POST_RESPONSE_STATUS = 201;
+
 export default class Controller implements IController {
   private storage: IStorage;
   private api: IApi;
@@ -44,7 +46,11 @@ export default class Controller implements IController {
           const newUser = { id: uuidv4(), ...body };
           this.storage.createUser(newUser);
 
-          this.api.sendResponse(res, JSON.stringify(newUser));
+          this.api.sendResponse(
+            res,
+            JSON.stringify(newUser),
+            POST_RESPONSE_STATUS
+          );
           break;
       }
     } catch (error) {

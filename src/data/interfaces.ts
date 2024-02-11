@@ -19,5 +19,9 @@ export interface IApi {
     req: IncomingMessage
   ) => STATUS;
   getBody: (req: IncomingMessage) => Promise<User>;
-  sendResponse: (res: ServerResponse<IncomingMessage>, payload: string) => void;
+  sendResponse: (
+    res: ServerResponse<IncomingMessage>,
+    payload: string,
+    status?: number
+  ) => void;
 }
