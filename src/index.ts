@@ -1,14 +1,9 @@
-import { createServer } from 'http';
+import Api from './api/api';
+import Controller from './controller/controller';
+import Storage from './storage/storage';
 
-const PORT = 3000;
+const storage = new Storage();
+const api = new Api();
+const controller = new Controller(storage, api);
 
-export const server = createServer((_, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/html' });
-  res.end('Hello wrld');
-});
-
-server.listen(PORT, () => {
-  console.log('server started');
-});
-
-
+controller.startServer();
