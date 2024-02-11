@@ -8,8 +8,14 @@ export default class Storage implements IStorage {
     this.storage = [];
   }
 
-  createUser() {
-    console.log(this.storage);
+  public createUser(user: UserStorage) {
+    this.storage.push(user);
+  }
+
+  public getUser(id: string): UserStorage | undefined {
+    const user = this.storage.find((user) => user.id === id);
+
+    return user;
   }
 
   public getStorage() {

@@ -1,6 +1,7 @@
 import UnsupportedMethodError from '../errors/UnsupportedMethodError';
 import { IncomingMessage, ServerResponse } from 'http';
 import BadRequestError from '../errors/BadRequestError';
+import NotFoundError from '../errors/NotFoundError';
 
 export default function handleError(
   error: Error,
@@ -11,10 +12,16 @@ export default function handleError(
     response.end(error.message);
     return;
   }
+
   if (error instanceof BadRequestError) {
     response.writeHead(400, { 'Content-Type': 'text/html' });
     response.end(error.message);
     return;
   }
-  console.log(error.message);
+
+  if (error instanceof NotFoundError) {
+    response.writeHead(404, { 'Content-Type': 'text/html' });
+    response.end(error.message);
+    return;
+  }
 }

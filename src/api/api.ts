@@ -8,7 +8,8 @@ import BadRequestError from '../errors/BadRequestError';
 // import { v4 as uuidv4 } from 'uuid';
 import { validate as validateuuid } from 'uuid';
 import isUuidNotExist from '../utils/isUuidNotExist';
-import { User } from 'data/types';
+import { User } from '../data/types';
+import { STATUS } from '../data/enums';
 
 export default class Api implements IApi {
   constructor() {}
@@ -32,7 +33,7 @@ export default class Api implements IApi {
 
     if (isUuidNotExist(urlSplitted[3])) return null;
 
-    return validateuuid(urlSplitted[3] ?? '') ? null : 'Non-valid uuid';
+    return validateuuid(urlSplitted[3] ?? '') ? null : 'Non-valid id';
   }
 
   public checkURL(res: ServerResponse<IncomingMessage>, req: IncomingMessage) {
@@ -40,18 +41,21 @@ export default class Api implements IApi {
 
     try {
       if (!this.methodCheck(method)) throw new UnsupportedMethodError();
+
       if (!this.endpointCheck(url)) throw new BadRequestError();
+
       const uuidValidation = this.uuidCheck(url);
       if (uuidValidation) throw new BadRequestError(uuidValidation);
-
-      // res.writeHead(200, { 'Content-Type': 'text/html' });
-      // res.end('Hello wrld');
     } catch (error) {
       handleError(error as Error, res);
+
+      return STATUS.NOT_OK;
     }
+
+    return STATUS.OK;
   }
 
-  public async getBody(req: IncomingMessage): Promise<User[]> {
+  public async getBody(req: IncomingMessage): Promise<User> {
     return new Promise((resolve, reject) => {
       let body: string = '';
 
@@ -72,5 +76,10 @@ export default class Api implements IApi {
         reject(new BadRequestError());
       });
     });
+  }
+
+  public sendResponse(res: ServerResponse<IncomingMessage>, payload: string) {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(payload);
   }
 }

@@ -3,6 +3,9 @@ import 'dotenv/config';
 import { IncomingMessage, ServerResponse, createServer } from 'http';
 import isUuidNotExist from '../utils/isUuidNotExist';
 import handleError from '../utils/handleError';
+import { v4 as uuidv4 } from 'uuid';
+import { STATUS } from '../data/enums';
+import NotFoundError from '../errors/NotFoundError';
 
 export default class Controller implements IController {
   private storage: IStorage;
@@ -26,15 +29,22 @@ export default class Controller implements IController {
           if (isUuidNotExist(urlSplitted[3])) {
             const storage = JSON.stringify(this.storage.getStorage());
 
-            res.writeHead(200, { 'Content-Type': 'application/json' });
-            res.end(storage);
+            this.api.sendResponse(res, storage);
+          } else {
+            const uuid = urlSplitted[3];
+            const user = this.storage.getUser(uuid as string);
+
+            if (!user) throw new NotFoundError(`id ${uuid} doesn't exist`);
+            this.api.sendResponse(res, JSON.stringify(user));
           }
           break;
 
         case 'POST':
           const body = await this.api.getBody(req);
-          console.log(body);
-          res.end();
+          const newUser = { id: uuidv4(), ...body };
+          this.storage.createUser(newUser);
+
+          this.api.sendResponse(res, JSON.stringify(newUser));
           break;
       }
     } catch (error) {
@@ -46,7 +56,7 @@ export default class Controller implements IController {
     const PORT = process.env.PORT;
 
     const server = createServer(async (req, res) => {
-      this.api.checkURL(res, req);
+      if (this.api.checkURL(res, req) !== STATUS.OK) return;
 
       await this.handleMethod(res, req);
     });
