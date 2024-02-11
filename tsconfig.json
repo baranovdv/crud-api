@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
     "baseUrl": "src",
+    "module": "commonjs",
     "forceConsistentCasingInFileNames": true,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "lib": ["ESNext"],
-    "module": "CommonJS",
     "moduleResolution": "Node",
     "noUncheckedIndexedAccess": true,
     "strictNullChecks": true,
