@@ -1,5 +1,4 @@
 import { IApi, IController, IStorage } from 'data/interfaces';
-import { createServer } from 'http';
 import 'dotenv/config';
 
 export default class Controller implements IController {
@@ -12,17 +11,7 @@ export default class Controller implements IController {
   }
 
   public startServer() {
-    const PORT = process.env.PORT;
-
-    console.log(PORT);
-    const server = createServer((_, res) => {
-      res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.end('Hello wrld');
-    });
-
-    server.listen(PORT, () => {
-      console.log('server started');
-    });
+    this.api.startServer();
   }
 
   httpRequest() {

@@ -7,4 +7,6 @@ export interface IStorage {
   createUser: () => void;
 }
 
-export interface IApi {}
+export interface IApi {
+  startServer: () => void;
+}

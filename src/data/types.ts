@@ -1,3 +1,7 @@
+import { HTTPMethods } from './data';
+
+export type HTTPMethods = (typeof HTTPMethods)[number];
+
 export type User = {
   username: string;
   age: number;
