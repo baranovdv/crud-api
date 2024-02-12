@@ -22,6 +22,12 @@ The application is run in development mode using `nodemon`
 
 The application is run in production mode using `webpack`
 
+- Run in multi mode
+  
+      npm run start:multi
+
+The application is run in production mode using `nodemon`. Create workers, amount of numOfCores - 1
+
 ## Testing
     npm run test
 
