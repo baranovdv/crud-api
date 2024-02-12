@@ -2,7 +2,7 @@ import { IApi } from '../data/interfaces';
 import { IncomingMessage, ServerResponse } from 'http';
 import * as dotenv from 'dotenv';
 import handleError from '../utils/handleError';
-import { HTTPMethods, endpoint } from '../data/data';
+import { HTTPMethods, ENDPOINT } from '../data/data';
 import UnsupportedMethodError from '../errors/UnsupportedMethodError';
 import BadRequestError from '../errors/BadRequestError';
 import { validate as validateuuid } from 'uuid';
@@ -26,7 +26,7 @@ export default class Api implements IApi {
 
     const urlSplitted = url.split('/');
 
-    return urlSplitted[1] === endpoint[0] && urlSplitted[2] === endpoint[1];
+    return urlSplitted[1] === ENDPOINT[0] && urlSplitted[2] === ENDPOINT[1];
   }
 
   private uuidCheck(url: string | undefined): string | null {

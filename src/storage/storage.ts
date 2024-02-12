@@ -8,17 +8,17 @@ export default class Storage implements IStorage {
     this.storage = [];
   }
 
-  public createUser(user: UserStorage) {
+  public async createUser(user: UserStorage) {
     this.storage.push(user);
   }
 
-  public getUser(id: string): UserStorage | undefined {
+  public async getUser(id: string): Promise<UserStorage | undefined> {
     const user = this.storage.find((user) => user.id === id);
 
     return user;
   }
 
-  public deleteUser(id: string): void {
+  public async deleteUser(id: string): Promise<void> {
     const indexOfUser = this.storage.indexOf(
       this.storage.find((user) => user.id === id) ?? ({} as UserStorage)
     );
@@ -26,7 +26,7 @@ export default class Storage implements IStorage {
     this.storage.splice(indexOfUser, 1);
   }
 
-  public updateUser(user: UserStorage): void {
+  public async updateUser(user: UserStorage): Promise<void> {
     const indexOfUser = this.storage.indexOf(
       this.storage.find((storageUser) => storageUser.id === user.id) ??
         ({} as UserStorage)
@@ -35,7 +35,7 @@ export default class Storage implements IStorage {
     this.storage[indexOfUser] = user;
   }
 
-  public getStorage() {
+  public async getStorage() {
     return this.storage;
   }
 }

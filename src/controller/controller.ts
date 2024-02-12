@@ -8,12 +8,15 @@ import { STATUS } from '../data/enums';
 import NotFoundError from '../errors/NotFoundError';
 import BadRequestError from '../errors/BadRequestError';
 import { constants } from 'http2';
+import { DEFAULT_PORT } from '../data/data';
+import checkURL from '../utils/checkURL';
 
 dotenv.config();
 
 export default class Controller implements IController {
   private storage: IStorage;
   private api: IApi;
+  private envPort = +(process.env['PORT'] ?? DEFAULT_PORT);
 
   constructor(storage: IStorage, api: IApi) {
     this.storage = storage;
@@ -32,11 +35,11 @@ export default class Controller implements IController {
       switch (method) {
         case 'GET':
           if (isUuidNotExist(uuid)) {
-            const storage = JSON.stringify(this.storage.getStorage());
+            const storage = JSON.stringify(await this.storage.getStorage());
 
             this.api.sendResponse(res, storage);
           } else {
-            const user = this.storage.getUser(uuid as string);
+            const user = await this.storage.getUser(uuid as string);
 
             if (!user) throw new NotFoundError(`id ${uuid} doesn't exist`);
             this.api.sendResponse(res, JSON.stringify(user));
@@ -47,7 +50,7 @@ export default class Controller implements IController {
           if (isUuidNotExist(uuid)) {
             const body = await this.api.getBody(req);
             const newUser = { id: uuidv4(), ...body };
-            this.storage.createUser(newUser);
+            await this.storage.createUser(newUser);
 
             this.api.sendResponse(
               res,
@@ -63,7 +66,7 @@ export default class Controller implements IController {
           if (isUuidNotExist(uuid)) {
             throw new BadRequestError();
           } else {
-            const userStored = this.storage.getUser(uuid as string);
+            const userStored = await this.storage.getUser(uuid as string);
 
             if (!userStored)
               throw new NotFoundError(`id ${uuid} doesn't exist`);
@@ -71,14 +74,14 @@ export default class Controller implements IController {
             const body = await this.api.getBody(req);
             const user = { id: uuid as string, ...body };
 
-            this.storage.updateUser(user);
+            await this.storage.updateUser(user);
 
             this.api.sendResponse(res, JSON.stringify(user));
           }
           break;
 
         case 'DELETE':
-          const user = this.storage.getUser(uuid as string);
+          const user = await this.storage.getUser(uuid as string);
 
           if (!user) {
             throw new NotFoundError(`id ${uuid} doesn't exist`);
@@ -99,18 +102,17 @@ export default class Controller implements IController {
 
   public createServer() {
     return createServer(async (req, res) => {
-      if (this.api.checkURL(res, req) !== STATUS.OK) return;
+      if (checkURL(res, req) !== STATUS.OK) return;
 
       await this.handleMethod(res, req);
     });
   }
 
-  public startServer() {
-    const PORT = process.env['PORT'];
+  public startServer(port = this.envPort) {
     const server = this.createServer();
 
-    server.listen(PORT, () => {
-      console.log('Server started');
+    server.listen(port, () => {
+      console.log(`Server started on port ${port} pid ${process.pid}`);
     });
   }
 }

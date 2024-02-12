@@ -1,3 +1,5 @@
 export const HTTPMethods = ['GET', 'POST', 'PUT', 'DELETE'];
 
-export const endpoint = ['api', 'users'];
+export const ENDPOINT = ['api', 'users'];
+
+export const DEFAULT_PORT = 3000;

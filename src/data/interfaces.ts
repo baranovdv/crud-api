@@ -1,5 +1,5 @@
 import { IncomingMessage, Server, ServerResponse } from 'http';
-import { User, UserStorage } from './types';
+import { CRUDMethods, User, UserStorage } from './types';
 import { STATUS } from './enums';
 
 export interface IController {
@@ -7,12 +7,19 @@ export interface IController {
   createServer: () => Server;
 }
 
+export interface IMasterController {
+  handleMessage: (message: string) => Promise<void>;
+  createUser: (user: UserStorage) => Promise<void>;
+  getUser: (id: string) => Promise<UserStorage | undefined>;
+  getStorage: () => Promise<UserStorage[]>;
+}
+
 export interface IStorage {
-  createUser: (user: UserStorage) => void;
-  getStorage: () => UserStorage[];
-  getUser: (id: string) => UserStorage | undefined;
-  deleteUser: (id: string) => void;
-  updateUser: (user: UserStorage) => void;
+  createUser: (user: UserStorage) => Promise<void>;
+  getStorage: () => Promise<UserStorage[]>;
+  getUser: (id: string) => Promise<UserStorage | undefined>;
+  deleteUser: (id: string) => Promise<void>;
+  updateUser: (user: UserStorage) => Promise<void>;
 }
 
 export interface IApi {
@@ -26,4 +33,11 @@ export interface IApi {
     payload: string,
     status?: number
   ) => void;
+}
+
+export interface IMessage {
+  method: CRUDMethods;
+  id?: string;
+  user?: UserStorage | undefined;
+  storage?: UserStorage[];
 }
