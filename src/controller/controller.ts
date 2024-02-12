@@ -7,11 +7,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { STATUS } from '../data/enums';
 import NotFoundError from '../errors/NotFoundError';
 import BadRequestError from '../errors/BadRequestError';
+import { constants } from 'http2';
 
 dotenv.config();
-
-const POST_RESPONSE_STATUS = 201;
-const DELETE_RESPONSE_STATUS = 204;
 
 export default class Controller implements IController {
   private storage: IStorage;
@@ -54,7 +52,7 @@ export default class Controller implements IController {
             this.api.sendResponse(
               res,
               JSON.stringify(newUser),
-              POST_RESPONSE_STATUS
+              constants.HTTP_STATUS_CREATED
             );
           } else {
             throw new BadRequestError();
@@ -89,7 +87,7 @@ export default class Controller implements IController {
             this.api.sendResponse(
               res,
               JSON.stringify('Deleted'),
-              DELETE_RESPONSE_STATUS
+              constants.HTTP_STATUS_NO_CONTENT
             );
           }
           break;
@@ -99,16 +97,20 @@ export default class Controller implements IController {
     }
   }
 
-  public startServer() {
-    const PORT = process.env['PORT'];
-
-    const server = createServer(async (req, res) => {
+  public createServer() {
+    return createServer(async (req, res) => {
       if (this.api.checkURL(res, req) !== STATUS.OK) return;
 
       await this.handleMethod(res, req);
     });
+  }
+
+  public startServer() {
+    const PORT = process.env['PORT'];
+    const server = this.createServer();
+
     server.listen(PORT, () => {
-      console.log('server started');
+      console.log('Server started');
     });
   }
 }

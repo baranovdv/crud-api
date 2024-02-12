@@ -1,9 +1,10 @@
-import { IncomingMessage, ServerResponse } from 'http';
+import { IncomingMessage, Server, ServerResponse } from 'http';
 import { User, UserStorage } from './types';
 import { STATUS } from './enums';
 
 export interface IController {
   startServer: () => void;
+  createServer: () => Server;
 }
 
 export interface IStorage {
