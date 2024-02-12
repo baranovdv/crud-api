@@ -4,7 +4,6 @@ import { STATUS } from './enums';
 
 export interface IController {
   startServer: () => void;
-  httpRequest: () => void;
 }
 
 export interface IStorage {

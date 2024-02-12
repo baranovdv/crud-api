@@ -1,5 +1,5 @@
-import { IApi, IController, IStorage } from 'data/interfaces';
-import 'dotenv/config';
+import { IApi, IController, IStorage } from '../data/interfaces';
+import * as dotenv from 'dotenv';
 import { IncomingMessage, ServerResponse, createServer } from 'http';
 import isUuidNotExist from '../utils/isUuidNotExist';
 import handleError from '../utils/handleError';
@@ -7,6 +7,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { STATUS } from '../data/enums';
 import NotFoundError from '../errors/NotFoundError';
 import BadRequestError from '../errors/BadRequestError';
+
+dotenv.config();
 
 const POST_RESPONSE_STATUS = 201;
 const DELETE_RESPONSE_STATUS = 204;
@@ -98,7 +100,7 @@ export default class Controller implements IController {
   }
 
   public startServer() {
-    const PORT = process.env.PORT;
+    const PORT = process.env['PORT'];
 
     const server = createServer(async (req, res) => {
       if (this.api.checkURL(res, req) !== STATUS.OK) return;
@@ -108,9 +110,5 @@ export default class Controller implements IController {
     server.listen(PORT, () => {
       console.log('server started');
     });
-  }
-
-  httpRequest() {
-    console.log(this.storage, this.api);
   }
 }

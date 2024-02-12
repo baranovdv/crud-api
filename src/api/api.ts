@@ -1,6 +1,6 @@
-import { IApi } from 'data/interfaces';
+import { IApi } from '../data/interfaces';
 import { IncomingMessage, ServerResponse } from 'http';
-import 'dotenv/config';
+import * as dotenv from 'dotenv';
 import handleError from '../utils/handleError';
 import { HTTPMethods, endpoint } from '../data/data';
 import UnsupportedMethodError from '../errors/UnsupportedMethodError';
@@ -11,6 +11,8 @@ import { User, UserStorage } from '../data/types';
 import { STATUS } from '../data/enums';
 import isArrayOfStrOrEmpty from '../utils/isArrayOfStrOrEmpty';
 import NotFoundError from '../errors/NotFoundError';
+
+dotenv.config();
 
 export default class Api implements IApi {
   constructor() {}

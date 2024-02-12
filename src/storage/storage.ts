@@ -1,5 +1,5 @@
-import { IStorage } from 'data/interfaces';
-import { UserStorage } from 'data/types';
+import { IStorage } from '../data/interfaces';
+import { UserStorage } from '../data/types';
 
 export default class Storage implements IStorage {
   private storage: UserStorage[];
