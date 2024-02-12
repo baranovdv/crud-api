@@ -24,4 +24,7 @@ export default function handleError(
     response.end(error.message);
     return;
   }
+
+  response.writeHead(500, { 'Content-Type': 'text/html' });
+  response.end('Internal Server Error');
 }
