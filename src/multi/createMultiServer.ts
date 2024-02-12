@@ -23,8 +23,6 @@ export default function createMultiServer() {
     const storage = new Storage();
     const masterController = new MasterController(storage);
 
-    console.log(masterController);
-
     for (let workerId = 0; workerId < numofCores - 1; workerId += 1) {
       const worker = cluster.fork();
 
@@ -60,6 +58,15 @@ export default function createMultiServer() {
               storage,
             };
             worker.send(JSON.stringify(getStorage));
+            break;
+
+          case 'DELETE':
+            await masterController.deleteUser(messageParsed.id!);
+
+            const deleteMessage: IMessage = {
+              method: 'DELETE',
+            };
+            worker.send(JSON.stringify(deleteMessage));
             break;
         }
       });

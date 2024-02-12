@@ -8,10 +8,11 @@ export interface IController {
 }
 
 export interface IMasterController {
-  handleMessage: (message: string) => Promise<void>;
   createUser: (user: UserStorage) => Promise<void>;
   getUser: (id: string) => Promise<UserStorage | undefined>;
   getStorage: () => Promise<UserStorage[]>;
+  deleteUser: (id: string) => Promise<void>;
+  updateUser: (user: UserStorage) => Promise<void>;
 }
 
 export interface IStorage {

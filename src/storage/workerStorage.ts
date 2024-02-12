@@ -36,6 +36,9 @@ export default class WorkerStorage implements IStorage {
           case 'CREATE':
             resolve('');
 
+          case 'DELETE':
+            resolve('');
+
           case 'GET_STORAGE':
             resolve(messageParsed.storage);
 
@@ -61,11 +64,13 @@ export default class WorkerStorage implements IStorage {
   }
 
   public async deleteUser(id: string): Promise<void> {
-    const indexOfUser = this.storage.indexOf(
-      this.storage.find((user) => user.id === id) ?? ({} as UserStorage)
-    );
+    await this.sendMessageToMain('DELETE', id);
 
-    this.storage.splice(indexOfUser, 1);
+    // const indexOfUser = this.storage.indexOf(
+    //   this.storage.find((user) => user.id === id) ?? ({} as UserStorage)
+    // );
+
+    // this.storage.splice(indexOfUser, 1);
   }
 
   public async updateUser(user: UserStorage): Promise<void> {
