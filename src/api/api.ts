@@ -5,12 +5,12 @@ import handleError from '../utils/handleError';
 import { HTTPMethods, endpoint } from '../data/data';
 import UnsupportedMethodError from '../errors/UnsupportedMethodError';
 import BadRequestError from '../errors/BadRequestError';
-// import { v4 as uuidv4 } from 'uuid';
 import { validate as validateuuid } from 'uuid';
 import isUuidNotExist from '../utils/isUuidNotExist';
-import { User } from '../data/types';
+import { User, UserStorage } from '../data/types';
 import { STATUS } from '../data/enums';
 import isArrayOfStrOrEmpty from '../utils/isArrayOfStrOrEmpty';
+import NotFoundError from '../errors/NotFoundError';
 
 export default class Api implements IApi {
   constructor() {}
@@ -37,7 +37,7 @@ export default class Api implements IApi {
     return validateuuid(urlSplitted[3] ?? '') ? null : 'Non-valid id';
   }
 
-  private POSTbodyCheck(body: User): boolean {
+  private bodyCheck(body: User): boolean {
     if (!body.age || !body.username || !body.hobbies) return false;
     if (Object.keys(body).length > 3) return false;
     if (
@@ -57,7 +57,7 @@ export default class Api implements IApi {
     try {
       if (!this.methodCheck(method)) throw new UnsupportedMethodError();
 
-      if (!this.endpointCheck(url)) throw new BadRequestError();
+      if (!this.endpointCheck(url)) throw new NotFoundError('No such endpoint');
 
       const uuidValidation = this.uuidCheck(url);
       if (uuidValidation) throw new BadRequestError(uuidValidation);
@@ -70,7 +70,7 @@ export default class Api implements IApi {
     return STATUS.OK;
   }
 
-  public async getBody(req: IncomingMessage): Promise<User> {
+  public async getBody(req: IncomingMessage): Promise<User | UserStorage> {
     return new Promise((resolve, reject) => {
       let body: string = '';
 
@@ -82,7 +82,7 @@ export default class Api implements IApi {
         try {
           const result = JSON.parse(body);
 
-          if (!this.POSTbodyCheck(result)) {
+          if (!this.bodyCheck(result)) {
             reject(new BadRequestError('Bad body data'));
           }
 

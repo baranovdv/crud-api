@@ -11,6 +11,8 @@ export interface IStorage {
   createUser: (user: UserStorage) => void;
   getStorage: () => UserStorage[];
   getUser: (id: string) => UserStorage | undefined;
+  deleteUser: (id: string) => void;
+  updateUser: (user: UserStorage) => void;
 }
 
 export interface IApi {

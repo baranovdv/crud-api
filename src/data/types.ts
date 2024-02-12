@@ -1,6 +1,4 @@
-import { HTTPMethods } from './data';
-
-export type HTTPMethods = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+export type HTTPMethodsType = 'GET' | 'POST' | 'PUT' | 'DELETE';
 
 export type User = {
   username: string;
