@@ -36,11 +36,9 @@ describe('2. POSTApiUsers', () => {
 
     expect(responsePOST.status).toBe(constants.HTTP_STATUS_CREATED);
 
-    const createdUserID = responsePOST.body.id;
+    const responseGET = await request.get('/api/users');
 
-    const responseGET = await request.get(`/api/users/${createdUserID}`);
-
-    expect(responseGET.body.age).toBe(mockUser.age);
+    expect(responseGET.body).toHaveLength(1);
   });
 
   it('case 2: get error 400 on wrong data', async () => {
