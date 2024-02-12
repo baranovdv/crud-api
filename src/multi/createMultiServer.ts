@@ -17,6 +17,8 @@ export default function createMultiServer() {
   const numofCores = cpus().length;
   const PORT = +(process.env['PORT'] ?? DEFAULT_PORT);
 
+  let iteration = 0;
+
   if (cluster.isPrimary) {
     const storage = new Storage();
     const masterController = new MasterController(storage);
@@ -70,10 +72,13 @@ export default function createMultiServer() {
 
     const server = createServer((req, res) => {
       if (checkURL(res, req) !== STATUS.OK) return;
+      iteration = iteration === numofCores ? 1 : iteration + 1;
+
+      const targetPort = PORT + iteration;
 
       const options = {
         ...url.parse(req.url ?? ''),
-        port: 3005,
+        port: targetPort,
         headers: req.headers,
         method: req.method,
       };
