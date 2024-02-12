@@ -8,10 +8,6 @@ export default class MasterController implements IMasterController {
     this.storage = storage;
   }
 
-  public async handleMessage(message: string) {
-    console.log(message);
-  }
-
   public async createUser(user: UserStorage) {
     await this.storage.createUser(user);
   }
@@ -33,6 +29,6 @@ export default class MasterController implements IMasterController {
   }
 
   public async updateUser(user: UserStorage) {
-    console.log(user);
+    await this.storage.updateUser(user);
   }
 }

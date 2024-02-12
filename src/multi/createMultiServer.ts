@@ -27,47 +27,62 @@ export default function createMultiServer() {
       const worker = cluster.fork();
 
       worker.on('message', async (message) => {
-        const messageParsed: IMessage = JSON.parse(message);
+        try {
+          const messageParsed: IMessage = JSON.parse(message);
 
-        console.log(`${messageParsed}`);
+          switch (messageParsed.method) {
+            case 'CREATE':
+              masterController.createUser(messageParsed.user!);
+              const createMessage: IMessage = {
+                method: 'CREATE',
+              };
+              worker.send(JSON.stringify(createMessage));
+              break;
 
-        switch (messageParsed.method) {
-          case 'CREATE':
-            masterController.createUser(messageParsed.user!);
-            const createMessage: IMessage = {
-              method: 'CREATE',
-            };
-            worker.send(JSON.stringify(createMessage));
-            break;
+            case 'GET':
+              const getUser = await masterController.getUser(messageParsed.id!);
 
-          case 'GET':
-            const getUser = await masterController.getUser(messageParsed.id!);
+              const getMessage: IMessage = {
+                method: 'GET',
+                user: getUser,
+              };
+              worker.send(JSON.stringify(getMessage));
+              break;
 
-            const getMessage: IMessage = {
-              method: 'GET',
-              user: getUser,
-            };
-            worker.send(JSON.stringify(getMessage));
-            break;
+            case 'GET_STORAGE':
+              const storage = await masterController.getStorage();
 
-          case 'GET_STORAGE':
-            const storage = await masterController.getStorage();
+              const getStorage: IMessage = {
+                method: 'GET_STORAGE',
+                storage,
+              };
+              worker.send(JSON.stringify(getStorage));
+              break;
 
-            const getStorage: IMessage = {
-              method: 'GET_STORAGE',
-              storage,
-            };
-            worker.send(JSON.stringify(getStorage));
-            break;
+            case 'DELETE':
+              await masterController.deleteUser(messageParsed.id!);
 
-          case 'DELETE':
-            await masterController.deleteUser(messageParsed.id!);
+              const deleteMessage: IMessage = {
+                method: 'DELETE',
+              };
+              worker.send(JSON.stringify(deleteMessage));
+              break;
 
-            const deleteMessage: IMessage = {
-              method: 'DELETE',
-            };
-            worker.send(JSON.stringify(deleteMessage));
-            break;
+            case 'UPDATE':
+              await masterController.updateUser(messageParsed.user!);
+
+              const updateMessage: IMessage = {
+                method: 'UPDATE',
+              };
+              worker.send(JSON.stringify(updateMessage));
+              break;
+          }
+        } catch {
+          const errorMessage: IMessage = {
+            method: 'ERROR',
+          };
+
+          worker.send(JSON.stringify(errorMessage));
         }
       });
     }
@@ -79,9 +94,11 @@ export default function createMultiServer() {
 
     const server = createServer((req, res) => {
       if (checkURL(res, req) !== STATUS.OK) return;
-      iteration = iteration === numofCores ? 1 : iteration + 1;
+      iteration = iteration === numofCores - 1 ? 1 : iteration + 1;
 
       const targetPort = PORT + iteration;
+
+      console.log(`Target port is ${targetPort}`);
 
       const options = {
         ...url.parse(req.url ?? ''),

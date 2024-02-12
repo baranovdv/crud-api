@@ -5,7 +5,8 @@ export type CRUDMethods =
   | 'CREATE'
   | 'GET'
   | 'DELETE'
-  | 'UPDATE';
+  | 'UPDATE'
+  | 'ERROR';
 
 export type User = {
   username: string;

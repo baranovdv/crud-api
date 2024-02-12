@@ -5,12 +5,6 @@ import { CRUDMethods, User, UserStorage } from '../data/types';
 import NotFoundError from '../errors/NotFoundError';
 
 export default class WorkerStorage implements IStorage {
-  private storage: UserStorage[];
-
-  constructor() {
-    this.storage = [];
-  }
-
   private async sendMessageToMain(
     method: CRUDMethods,
     id?: string,
@@ -27,7 +21,6 @@ export default class WorkerStorage implements IStorage {
 
       cluster.worker!.once('message', (message: string) => {
         const messageParsed: IMessage = JSON.parse(message);
-        console.log(message);
 
         switch (messageParsed.method) {
           case 'GET':
@@ -39,8 +32,14 @@ export default class WorkerStorage implements IStorage {
           case 'DELETE':
             resolve('');
 
+          case 'UPDATE':
+            resolve('');
+
           case 'GET_STORAGE':
             resolve(messageParsed.storage);
+
+          case 'GET_STORAGE':
+            reject(new Error());
 
           default:
             reject(new NotFoundError());
@@ -51,35 +50,20 @@ export default class WorkerStorage implements IStorage {
 
   public async createUser(user: UserStorage): Promise<void> {
     await this.sendMessageToMain('CREATE', '_', user);
-    this.storage.push(user);
   }
 
   public async getUser(id: string): Promise<UserStorage | undefined> {
     const user = await this.sendMessageToMain('GET', id);
-    console.log(user);
-    // const user = await this.sendMessageToMain('GET', id);
-    // const user = this.storage.find((user) => user.id === id);
 
     return user;
   }
 
   public async deleteUser(id: string): Promise<void> {
     await this.sendMessageToMain('DELETE', id);
-
-    // const indexOfUser = this.storage.indexOf(
-    //   this.storage.find((user) => user.id === id) ?? ({} as UserStorage)
-    // );
-
-    // this.storage.splice(indexOfUser, 1);
   }
 
   public async updateUser(user: UserStorage): Promise<void> {
-    const indexOfUser = this.storage.indexOf(
-      this.storage.find((storageUser) => storageUser.id === user.id) ??
-        ({} as UserStorage)
-    );
-
-    this.storage[indexOfUser] = user;
+    await this.sendMessageToMain('UPDATE', '_', user);
   }
 
   public async getStorage() {
